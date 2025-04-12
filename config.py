@@ -10,13 +10,15 @@ from litestar_users.config import (
     UserManagementHandlerConfig,
 )
 
+from env import env
 from users.models import User, UserReadDTO, UserUpdateDTO
 from users.schemas import UserRegistrationDTO
 from users.services import UserService
 
-DATABASE_URL = "sqlite+aiosqlite:///test.db"
+# DATABASE_URL = "sqlite+aiosqlite:///test.db"
+DATABASE_URL = "postgresql+asyncpg://user:password@db:5432/litestar_intro"
 sqlalchemy_config = SQLAlchemyAsyncConfig(
-    connection_string=DATABASE_URL,
+    connection_string=env.database_url,
     session_dependency_key="session",
     session_config=AsyncSessionConfig(expire_on_commit=False),
     before_send_handler="autocommit",  # otherwise it does not commit and I don't know how to deal with it, also https://mvbosch.github.io/litestar-users/usage/0-configuration/#:~:text=Warning
@@ -24,7 +26,6 @@ sqlalchemy_config = SQLAlchemyAsyncConfig(
 ENCODING_SECRET = "1234567890abcdef"  # noqa: S105
 
 litestar_users_config = LitestarUsersConfig(
-    auth_backend_class=JWTAuth,
     secret=ENCODING_SECRET,
     user_model=User,  # pyright: ignore
     user_read_dto=UserReadDTO,
@@ -34,8 +35,9 @@ litestar_users_config = LitestarUsersConfig(
     current_user_handler_config=CurrentUserHandlerConfig(),
     register_handler_config=RegisterHandlerConfig(),
     user_management_handler_config=UserManagementHandlerConfig(),  # deletion, update, read
-    require_verification_on_registration=False,  # Only for demonstration
+    auth_backend_class=JWTAuth,
     auth_handler_config=AuthHandlerConfig(),
+    require_verification_on_registration=False,  # Only for demonstration
 )
 
 

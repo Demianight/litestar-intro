@@ -10,13 +10,13 @@ class UserController(Controller):
 
     path = "/users"
 
-    @get("", return_dto=UserReadDTO)
+    @get("", return_dto=UserReadDTO, exclude_from_auth=True)
     async def get_users(
         self,
         session: AsyncSession,  # session provided by SQLAlchemy plugin
-    ):
+    ) -> list[User]:
         """
         Get all users.
         Apparently there is no included 'users' endpoint in the litestar_users plugin (or I didn't find it)
         """
-        return (await session.execute(select(User))).scalars().all()
+        return (await session.execute(select(User))).scalars().all()  # type: ignore

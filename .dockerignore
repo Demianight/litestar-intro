@@ -1,0 +1,4 @@
+.venv/
+test.db
+verification_tokens.txt
+__pycache__/
